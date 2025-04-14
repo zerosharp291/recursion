@@ -9,18 +9,22 @@
 #include <string>
 #include <fstream>
 #include <random>
+#include <vector>
+#include <sstream>
 
 class bottle {
-    int filling; // время, необходимое на наполнение
-    int capping; // время, необходимое на закупоривание
+    unsigned long filling; // время, необходимое на наполнение
+    unsigned long capping; // время, необходимое на закупоривание
 public:
-    bottle(int f, int c);
+    bottle(unsigned long f, unsigned long c);
 
     ~bottle() = default;
 
-    int get_filling() const;
+    [[nodiscard]] unsigned long get_filling() const;
 
-    int get_capping() const;
+    [[nodiscard]] unsigned long get_capping() const;
+
+    [[nodiscard]] unsigned long get_processing_time() const;
 };
 
 inline void generate_bottles_file(
@@ -36,21 +40,48 @@ inline void generate_bottles_file(
      * const int count, -- число бутылок
      * const std::string &filename -- имя выходного файла
      */
-    std::ofstream outfile{filename};
+    if (std::ofstream outfile{filename}; outfile.is_open()) {
+        std::random_device rd;
+        std::mt19937 gen{rd()};
 
-    std::random_device rd;
-    std::mt19937 gen{rd()};
+        std::uniform_int_distribution dist{filling_range.first, filling_range.second};
 
-    std::uniform_int_distribution dist{filling_range.first, filling_range.second};
-
-    for (int i = 0; i < count; i++) {
-        outfile << dist(gen) << " ";
+        for (int i = 0; i < count; i++) {
+            outfile << dist(gen) << " ";
+        }
+        outfile << "\n";
+        std::uniform_int_distribution dist2{capping_range.first, capping_range.second};
+        for (int i = 0; i < count; i++) {
+            outfile << dist2(gen) << " ";
+        }
+        outfile.close();
+    } else {
+        throw std::runtime_error("Failed to open file");
     }
-    outfile << "\n";
-    std::uniform_int_distribution dist2{capping_range.first, capping_range.second};
-    for (int i = 0; i < count; i++) {
-        outfile << dist2(gen) << " ";
+}
+
+inline std::vector<bottle> get_bottles_from_file(const std::string &filename) {
+    std::vector<bottle> bottles;
+
+    if (std::ifstream infile{filename}; !infile.is_open()) {
+        std::string filling_line;
+        std::string capping_line;
+
+        getline(infile, filling_line);
+        getline(infile, capping_line);
+
+        std::istringstream filling_stream(filling_line);
+        std::istringstream capping_stream(capping_line);
+
+        std::string fill_elem;
+        std::string capp_elem;
+        while (filling_stream >> fill_elem) {
+            capping_stream >> capp_elem;
+            bottles.emplace_back(std::stoul(fill_elem), std::stoul(capp_elem));
+        }
     }
+
+    return bottles;
 }
 
 #endif //BOTTLE_H

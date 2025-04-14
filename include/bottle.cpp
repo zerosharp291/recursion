@@ -4,12 +4,16 @@
 
 #include "bottle.h"
 
-bottle::bottle(const int f, const int c): filling(f), capping(c) {}
+bottle::bottle(const unsigned long f, const unsigned long c): filling(f), capping(c) {}
 
-int bottle::get_filling() const {
+unsigned long bottle::get_filling() const {
     return filling;
 }
 
-int bottle::get_capping() const {
+unsigned long bottle::get_capping() const {
     return capping;
+}
+
+unsigned long bottle::get_processing_time() const {
+    return filling + capping;
 }
