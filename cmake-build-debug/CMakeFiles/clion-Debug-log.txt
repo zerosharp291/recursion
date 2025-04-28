@@ -11,6 +11,6 @@
 -- Check for working CXX compiler: C:/mingw64/bin/g++.exe - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
--- Configuring done (2.4s)
+-- Configuring done (6.2s)
 -- Generating done (0.1s)
 -- Build files have been written to: C:/Users/zeros/CLionProjects/recursion/cmake-build-debug
